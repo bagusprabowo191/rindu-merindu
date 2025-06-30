@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kitty Seller Shop - Kasir Online</title>
+    <style>
+      /* CSS Dasar untuk Tata Letak dan Animasi */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      header {
+        background-color: #007bff; /* Pink */
+        color: white;
+        padding: 1em 0;
+        text-align: center;
+        animation: fadeInDown 1s ease-out;
+      }
+      nav {
+        background-color: #339cff; /* Light Pink */
+        padding: 0.8em 0;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: sticky; /* Agar nav tetap di atas saat scroll */
+        top: 0;
+        z-index: 1000;
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 0.8em 1.5em;
+        margin: 0 5px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+      nav a:hover {
+        background-color: #0056b3; /* Darker Pink */
+        transform: translateY(-2px);
+      }
+      .container {
+        width: 80%;
+        margin: 20px auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      section {
+        padding: 20px 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        animation: fadeIn 1.5s ease-out;
+      }
+      section:last-child {
+        border-bottom: none;
+      }
+      h2 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .product-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+      }
+      .product-item:hover {
+        transform: translateY(-5px);
+      }
+      .product-item img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .product-item button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+      }
+      .product-item button:hover {
+        background-color: #0056b3;
+      }
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1001; /* Sit on top, di atas nav */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        animation: fadeIn 0.5s;
+      }
+      .modal-content {
+        background-color: #ffffff;
+        margin: 10% auto; /* 10% from the top and centered */
+        padding: 30px;
+        border: 1px solid #888;
+        width: 70%; /* Lebih lebar untuk info detail */
+        max-width: 700px;
+        border-radius: 8px;
+        position: relative;
+        animation: slideInTop 0.5s;
+      }
+      .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        transition: color 0.2s;
+      }
+      .close-button:hover,
+      .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      #cart-items {
+        list-style: none;
+        padding: 0;
+      }
+      #cart-items li {
+        background-color: #ffffff;
+        margin-bottom: 8px;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #cart-items li span {
+        font-weight: bold;
+      }
+      #cart-total,
+      #cart-quantity-total {
+        text-align: right;
+        font-size: 1.2em;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .review-form label,
+      .review-form textarea,
+      .review-form input[type="text"],
+      .review-form input[type="submit"],
+      .review-form select {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box; /* Agar padding tidak menambah lebar */
+      }
+      .review-form textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+      .review-form input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .review-form input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+      .customer-review {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+      .customer-review .stars {
+        color: gold;
+        margin-bottom: 5px;
+      }
+      .customer-review .reviewer-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #007bff;
+      }
+      footer {
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        padding: 1em 0;
+        margin-top: 20px;
+        animation: fadeInUp 1s ease-out;
+      }
+      /* Keyframe Animations */
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideInTop {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Selamat Datang di Kitty Seller Shop</h1>
+      <p>Solusi Elektronik Terbaik Anda!</p>
+    </header>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#about-shop">Tentang Toko</a>
+      <a href="#about-owner">Tentang Pemilik</a>
+      <a href="#products">Produk</a>
+      <a href="#testimonials">Testimoni</a>
+      <a href="#contact">Kontak</a>
+      <a href="#cart">Keranjang (<span id="cart-count">0</span>)</a>
+    </nav>
+    <div class="container">
+      <section id="home">
+        <h2>Home</h2>
+        <p>
+          Selamat datang di Kitty Seller Shop, toko online terkemuka untuk
+          segala kebutuhan elektronik Anda. Kami menyediakan berbagai macam
+          produk berkualitas tinggi dengan harga yang kompetitif. Jelajahi
+          penawaran terbaik kami sekarang!
+        </p>
+        <p>
+          <a
+            href="#products"
+            style="
+              background-color: #007bff;
+              color: white;
+              padding: 10px 20px;
+              text-decoration: none;
+              border-radius: 5px;
+              display: inline-block;
+              margin-top: 15px;
+            "
+            >Lihat Produk Unggulan &gt;&gt;</a
+          >
+        </p>
+      </section>
+      <section id="about-shop">
+        <h2>Tentang Toko Kitty Seller Shop</h2>
+        <p>
+          Kitty Seller Shop adalah destinasi utama Anda untuk produk elektronik
+          berkualitas. Didirikan dengan komitmen untuk menyediakan teknologi
+          terkini dan layanan pelanggan yang luar biasa, kami menawarkan
+          berbagai macam produk mulai dari gadget pintar, perangkat rumah
+          tangga, hingga aksesori inovatif.
+        </p>
+        <p>
+          Kami bangga menjadi mitra terpercaya Anda dalam memenuhi kebutuhan
+          elektronik dengan produk asli dan bergaransi.
+        </p>
+      </section>
+      <section id="about-owner">
+        <h2>Tentang Pemilik Toko Kitty Seller Shop</h2>
+        <p>Di balik kesuksesan Kitty Seller Shop, ada tim yang berdedikasi:</p>
+        <ul>
+          <li><strong>Bos:</strong> Bagus Prabowo</li>
+          <li><strong>Manager:</strong> Shandy Syahputra</li>
+          <li>
+            <strong>Supervisor:</strong> Atika Azizah dan Nadya Salsabilla
+          </li>
+        </ul>
+      </section>
+      <section id="products">
+        <h2>Produk Kami</h2>
+        <div class="product-grid">
+          <div class="product-item">
+            <img src="hp.jpg" alt="Smartphone" />
+            <h3>Smartphone Terbaru</h3>
+            <p>Harga: Rp 5.500.000</p>
+            <button onclick="showProductDetail('prod01')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod01', name: 'Smartphone Terbaru', price: 5500000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="laptop.jpg" alt="Laptop Gaming" />
+            <h3>Laptop Gaming Pro</h3>
+            <p>Harga: Rp 12.000.000</p>
+            <button onclick="showProductDetail('prod02')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod02', name: 'Laptop Gaming Pro', price: 12000000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="Smartwatch.jpg" alt="Smartwatch" />
+            <h3>Smartwatch Canggih</h3>
+            <p>Harga: Rp 1.500.000</p>
+            <button onclick="showProductDetail('prod03')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod03', name: 'Smartwatch Canggih', price: 1500000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="tws.jpg" alt="Headphone Noise Cancelling" />
+            <h3>Headphone Noise Cancelling</h3>
+            <p>Harga: Rp 800.000</p>
+            <button onclick="showProductDetail('prod04')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod04', name: 'Headphone Noise Cancelling', price: 800000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="Tv.jpg" alt="Smart TV 4K" />
+            <h3>Smart TV 4K Ultra HD</h3>
+            <p>Harga: Rp 7.000.000</p>
+            <button onclick="showProductDetail('prod05')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod05', name: 'Smart TV 4K Ultra HD', price: 7000000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="Camera.jpg" alt="Kamera DSLR" />
+            <h3>Kamera DSLR Profesional</h3>
+            <p>Harga: Rp 9.500.000</p>
+            <button onclick="showProductDetail('prod06')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod06', name: 'Kamera DSLR Profesional', price: 9500000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="Speaker.jpg" alt="Speaker Bluetooth" />
+            <h3>Speaker Bluetooth Portabel</h3>
+            <p>Harga: Rp 600.000</p>
+            <button onclick="showProductDetail('prod07')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod07', name: 'Speaker Bluetooth Portabel', price: 600000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="Drone.jpg" alt="Drone" />
+            <h3>Drone Lipat Mini</h3>
+            <p>Harga: Rp 3.000.000</p>
+            <button onclick="showProductDetail('prod08')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod08', name: 'Drone Lipat Mini', price: 3000000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="tablet.jpg" alt="Tablet" />
+            <h3>Tablet Android Terbaru</h3>
+            <p>Harga: Rp 4.000.000</p>
+            <button onclick="showProductDetail('prod09')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod09', name: 'Tablet Android Terbaru', price: 4000000})"
+            >
+              Beli
+            </button>
+          </div>
+          <div class="product-item">
+            <img src="powerbank.jpg" alt="Power Bank" />
+            <h3>Power Bank Fast Charging</h3>
+            <p>Harga: Rp 350.000</p>
+            <button onclick="showProductDetail('prod10')">
+              Info Detail & Manfaat
+            </button>
+            <button
+              onclick="addToCart({id: 'prod10', name: 'Power Bank Fast Charging', price: 350000})"
+            >
+              Beli
+            </button>
+          </div>
+        </div>
+      </section>
+      <div id="productDetailModal" class="modal">
+        <div class="modal-content">
+          <span class="close-button" onclick="closeProductDetailModal()"
+            >&times;</span
+          >
+          <h2 id="productDetailTitle"></h2>
+          <p><strong>Info Detail:</strong></p>
+          <p id="productDetailInfo"></p>
+          <p><strong>Manfaat:</strong></p>
+          <p id="productDetailBenefit"></p>
+        </div>
+      </div>
+      <section id="testimonials">
+        <h2>Testimoni Pelanggan</h2>
+        <p>
+          Baca apa kata pelanggan kami tentang produk-produk hebat dari Kitty
+          Seller Shop!
+        </p>
+        <div id="testimonial-list"></div>
+        <p style="text-align: center; font-style: italic; margin-top: 20px">
+          "Setiap produk yang kami jual telah diuji dan disukai oleh banyak
+          pelanggan. Kualitas adalah prioritas kami!"
+        </p>
+      </section>
+      <section id="contact">
+        <h2>Kontak Kami</h2>
+        <p>
+          Jangan ragu untuk menghubungi kami jika Anda memiliki pertanyaan atau
+          membutuhkan bantuan.
+        </p>
+        <ul>
+          <li><strong>Nama Pemilik Toko:</strong> Om Adus</li>
+          <li>
+            <strong>WhatsApp Toko:</strong>
+            <a href="https://wa.me/6289520526651" target="_blank"
+              >089520526651</a
+            >
+          </li>
+          <li>
+            <strong>Email:</strong>
+            <a href="mailto:timkittysellershop.id.com"
+              >timkittysellershop.id.com</a
+            >
+          </li>
+        </ul>
+      </section>
+      <section id="cart">
+        <h2>Keranjang Belanja</h2>
+        <div id="cart-empty-message" style="text-align: center; color: #888">
+          Keranjang Anda kosong.
+        </div>
+        <ul id="cart-items"></ul>
+        <p id="cart-quantity-total">Jumlah Barang: 0</p>
+        <p id="cart-total">Total Harga: Rp 0</p>
+        <button
+          id="checkout-button"
+          style="
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+          "
+          onclick="checkout()"
+        >
+          Lanjutkan Pembayaran
+        </button>
+      </section>
+      <section id="customer-reviews-section" style="display: none">
+        <h2>Ulasan Pelanggan</h2>
+        <div id="customer-reviews"></div>
+        <hr />
+        <h3>Berikan Ulasan Anda</h3>
+        <form id="review-form" class="review-form">
+          <label for="reviewer-name">Nama Anda:</label>
+          <input type="text" id="reviewer-name" required />
+          <label for="review-product">Produk yang Diulas:</label>
+          <select id="review-product" required>
+            <option value="">Pilih Produk</option>
+          </select>
+          <label for="rating">Rating (1-5 Bintang):</label>
+          <select id="rating" required>
+            <option value="5">⭐⭐⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐</option>
+          </select>
+          <label for="review-text">Ulasan Anda:</label>
+          <textarea id="review-text" rows="4" required></textarea>
+          <input type="submit" value="Kirim Ulasan" />
+        </form>
+      </section>
+    </div>
+    <footer>
+      <p>&copy; 2025 Kitty Seller Shop. Semua Hak Dilindungi.</p>
+    </footer>
+    <script>
+      // Data Produk
+      const products = [
+        {
+          id: "prod01",
+          name: "Smartphone Terbaru",
+          price: 5500000,
+          detail:
+            "Smartphone canggih dengan kamera 108MP, prosesor tercepat, layar AMOLED 120Hz, RAM 8GB, dan baterai tahan lama 5000mAh dengan fast charging.",
+          benefit:
+            "Abadikan momen terbaik dengan detail luar biasa, nikmati performa tanpa lag untuk game dan multitasking, tampilan visual yang jernih dan mulus, serta tetap terhubung sepanjang hari tanpa khawatir kehabisan daya.",
+          testimonial:
+            "Smartphone ini luar biasa! Fotonya jernih dan sangat cepat. Layarnya juga enak banget buat nonton film. Recomended!",
+        },
+        {
+          id: "prod02",
+          name: "Laptop Gaming Pro",
+          price: 12000000,
+          detail:
+            "Laptop gaming dengan kartu grafis NVIDIA GeForce RTX 4060, prosesor Intel Core i7 generasi terbaru, layar IPS 15.6 inci 144Hz, dan sistem pendingin efisien.",
+          benefit:
+            "Rasakan pengalaman gaming yang imersif dan grafis ultra-realistis, performa tinggi untuk pekerjaan kreatif seperti editing video dan desain 3D, serta bermain game tanpa lag dan overheating.",
+          testimonial:
+            "Gaming jadi lancar banget pakai laptop ini, gak nyesel beli! Desainnya juga keren dan kokoh.",
+        },
+        {
+          id: "prod03",
+          name: "Smartwatch Canggih",
+          price: 1500000,
+          detail:
+            "Smartwatch dengan pelacak kesehatan lengkap (detak jantung, SpO2, tidur), notifikasi pintar dari smartphone, daya tahan baterai hingga 7 hari, dan desain tahan air.",
+          benefit:
+            "Pantau kesehatan dan kebugaran Anda secara real-time, terima notifikasi instan panggilan/pesan tanpa perlu melihat HP, motivasi hidup lebih aktif, dan bebas khawatir saat beraktivitas di luar ruangan.",
+          testimonial:
+            "Smartwatch ini sangat membantu untuk menjaga kebugaran, fiturnya lengkap dan baterainya awet banget. Desainnya juga stylish.",
+        },
+        {
+          id: "prod04",
+          name: "Headphone Noise Cancelling",
+          price: 800000,
+          detail:
+            "Headphone over-ear dengan teknologi Active Noise Cancellation (ANC) terdepan, suara jernih dengan bass mendalam, dan bantalan telinga yang empuk untuk kenyamanan ekstra.",
+          benefit:
+            "Nikmati musik tanpa gangguan kebisingan eksternal, fokus bekerja atau belajar di lingkungan ramai, dan rasakan kualitas audio premium untuk pengalaman mendengarkan yang superior.",
+          testimonial:
+            "Suara headphone nya mantap, noise cancellingnya efektif banget. Cocok buat kerja di cafe atau pas naik transportasi umum.",
+        },
+        {
+          id: "prod05",
+          name: "Smart TV 4K Ultra HD",
+          price: 7000000,
+          detail:
+            "Smart TV 4K UHD 55 inci dengan kualitas gambar memukau (HDR10+), akses langsung ke aplikasi streaming populer seperti Netflix, YouTube, dan Disney+, serta kontrol suara terintegrasi.",
+          benefit:
+            "Rasakan hiburan berkualitas sinema di rumah Anda dengan detail gambar yang luar biasa, tonton konten favorit dengan mudah, dan kendalikan TV hanya dengan suara Anda.",
+          testimonial:
+            "TV nya jernih banget gambarnya, nonton film jadi lebih seru kayak di bioskop. Smart TV nya juga responsif.",
+        },
+        {
+          id: "prod06",
+          name: "Kamera DSLR Profesional",
+          price: 9500000,
+          detail:
+            "Kamera DSLR dengan sensor full-frame 24.2MP, sistem fokus otomatis 45 titik, dan kemampuan merekam video 4K pada 30fps, ideal untuk fotografi dan videografi profesional.",
+          benefit:
+            "Abadikan momen dengan kualitas profesional yang detail dan tajam, hasilkan foto dengan efek bokeh yang indah, serta kembangkan kreativitas Anda dalam dunia fotografi dan videografi.",
+          testimonial:
+            "Hasil fotonya tajam, sangat mudah digunakan meskipun fiturnya banyak. Cocok untuk pemula yang ingin serius di dunia fotografi.",
+        },
+        {
+          id: "prod07",
+          name: "Speaker Bluetooth Portabel",
+          price: 600000,
+          detail:
+            "Speaker portabel berukuran ringkas dengan suara bass powerful, sertifikasi tahan air IPX7, dan daya tahan baterai hingga 10 jam pemutaran non-stop.",
+          benefit:
+            "Nikmati musik favorit di mana saja, kapan saja, dengan kualitas suara yang luar biasa, cocok untuk pesta di luar ruangan atau teman bersantai di rumah, dan tidak perlu khawatir kehujanan atau kecipratan air.",
+          testimonial:
+            "Speaker ini kecil tapi suaranya nendang, gampang dibawa kemana-mana. Kualitas suaranya beyond expectation!",
+        },
+        {
+          id: "prod08",
+          name: "Drone Lipat Mini",
+          price: 3000000,
+          detail:
+            "Drone kompak yang dapat dilipat, dilengkapi kamera 4K dengan stabilisasi gimbal 3-axis, jarak terbang hingga 4km, dan fitur Return-to-Home untuk keamanan.",
+          benefit:
+            "Rekam pemandangan indah dari udara dengan kualitas video profesional, mudah dibawa bepergian karena desain lipatnya, dan aman digunakan bahkan untuk pemula berkat fitur-fitur pintarnya.",
+          testimonial:
+            "Pertama kali pakai drone ini langsung bisa, gambarnya stabil dan bagus. Cocok buat ngevlog atau bikin konten outdoor.",
+        },
+        {
+          id: "prod09",
+          name: "Tablet Android Terbaru",
+          price: 4000000,
+          detail:
+            "Tablet ramping dengan layar AMOLED 10.4 inci yang cerah, prosesor octa-core cepat, RAM 6GB, dan baterai 7040mAh untuk penggunaan sepanjang hari.",
+          benefit:
+            "Ideal untuk produktivitas (belajar, meeting online), hiburan (streaming film, gaming), dan membaca e-book, portabel dan bertenaga untuk menemani aktivitas Anda.",
+          testimonial:
+            "Tabletnya ringan, layarnya bagus banget buat nonton dan baca e-book. Performanya juga cepat buat multitasking.",
+        },
+        {
+          id: "prod10",
+          name: "Power Bank Fast Charging",
+          price: 350000,
+          detail:
+            "Power bank berkapasitas 20.000mAh dengan fitur fast charging 22.5W (USB-C PD & QC 3.0), dan dilengkapi dua port output untuk mengisi dua perangkat sekaligus.",
+          benefit:
+            "Jangan khawatir kehabisan baterai saat bepergian, isi daya perangkat Anda di mana saja dengan cepat, dan bisa mengisi beberapa kali untuk smartphone atau tablet Anda.",
+          testimonial:
+            "Power bank ini sangat membantu, ngecas HP jadi cepat banget. Kapasitasnya besar jadi awet buat seharian.",
+        },
+      ];
+      let cart = [];
+      let customersReviews = [];
+      // Fungsi untuk menampilkan detail produk (Modal)
+      function showProductDetail(productId) {
+        const product = products.find((p) => p.id === productId);
+        if (product) {
+          document.getElementById("productDetailTitle").innerText =
+            product.name;
+          document.getElementById("productDetailInfo").innerText =
+            product.detail;
+          document.getElementById("productDetailBenefit").innerText =
+            product.benefit;
+          document.getElementById("productDetailModal").style.display = "block";
+        }
+      }
+      // Fungsi untuk menutup modal detail produk
+      function closeProductDetailModal() {
+        document.getElementById("productDetailModal").style.display = "none";
+      }
+      // Fungsi untuk menambah produk ke keranjang
+      function addToCart(product) {
+        const existingItem = cart.find((item) => item.id === product.id);
+        if (existingItem) {
+          existingItem.quantity++;
+        } else {
+          cart.push({ ...product, quantity: 1 });
+        }
+        updateCartDisplay();
+        alert(`${product.name} telah ditambahkan ke keranjang!`);
+        // Setelah menambahkan ke keranjang, scroll kembali ke Home
+        document.getElementById("home").scrollIntoView({ behavior: "smooth" });
+        // Munculkan bagian ulasan pelanggan jika belum terlihat
+        document.getElementById("customer-reviews-section").style.display =
+          "block";
+        populateReviewProductSelect();
+      }
+      // Fungsi untuk memperbarui tampilan keranjang
+      function updateCartDisplay() {
+        const cartItemsContainer = document.getElementById("cart-items");
+        const cartTotalElement = document.getElementById("cart-total");
+        const cartQuantityTotalElement = document.getElementById(
+          "cart-quantity-total"
+        );
+        const cartCountElement = document.getElementById("cart-count");
+        const cartEmptyMessage = document.getElementById("cart-empty-message");
+        let total = 0;
+        let totalQuantity = 0;
+        cartItemsContainer.innerHTML = ""; // Kosongkan dulu
+        if (cart.length === 0) {
+          cartEmptyMessage.style.display = "block";
+        } else {
+          cartEmptyMessage.style.display = "none";
+          cart.forEach((item) => {
+            const listItem = document.createElement("li");
+            const itemTotal = item.price * item.quantity;
+            listItem.innerHTML = `${item.name} x ${
+              item.quantity
+            } <span>Rp ${itemTotal.toLocaleString("id-ID")}</span>`;
+            cartItemsContainer.appendChild(listItem);
+            total += itemTotal;
+            totalQuantity += item.quantity;
+          });
+        }
+        cartTotalElement.innerText = `Total Harga: Rp ${total.toLocaleString(
+          "id-ID"
+        )}`;
+        cartQuantityTotalElement.innerText = `Jumlah Barang: ${totalQuantity}`;
+        cartCountElement.innerText = totalQuantity; // Update angka di nav bar
+      }
+      // Fungsi simulasi checkout (bisa dikembangkan ke halaman pembayaran)
+      function checkout() {
+        if (cart.length === 0) {
+          alert(
+            "Keranjang Anda masih kosong. Silakan tambahkan produk terlebih dahulu."
+          );
+          return;
+        }
+        alert(
+          "Terima kasih telah berbelanja di Kitty Seller Shop! Pesanan Anda sedang diproses."
+        );
+        // Kosongkan keranjang setelah checkout
+        cart = [];
+        updateCartDisplay();
+        // Scroll ke bagian ulasan pelanggan setelah checkout
+        document
+          .getElementById("customer-reviews-section")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+      // Fungsi untuk mengisi opsi produk di form ulasan
+      function populateReviewProductSelect() {
+        const selectElement = document.getElementById("review-product");
+        selectElement.innerHTML = '<option value="">Pilih Produk</option>'; // Reset
+        products.forEach((product) => {
+          const option = document.createElement("option");
+          option.value = product.id;
+          option.innerText = product.name;
+          selectElement.appendChild(option);
+        });
+      }
+      // Fungsi untuk menambahkan ulasan pelanggan
+      document
+        .getElementById("review-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Mencegah form reload halaman
+          const reviewerName = document.getElementById("reviewer-name").value;
+          const reviewProductId =
+            document.getElementById("review-product").value;
+          const rating = document.getElementById("rating").value;
+          const reviewText = document.getElementById("review-text").value;
+          const reviewedProduct = products.find(
+            (p) => p.id === reviewProductId
+          );
+          if (!reviewedProduct) {
+            alert("Silakan pilih produk yang valid.");
+            return;
+          }
+          const newReview = {
+            name: reviewerName,
+            product: reviewedProduct.name,
+            rating: parseInt(rating),
+            review: reviewText,
+            date: new Date().toLocaleDateString("id-ID"),
+          };
+          customersReviews.push(newReview);
+          displayCustomerReviews();
+          alert("Terima kasih atas ulasan Anda!");
+          this.reset(); // Reset form
+        });
+      // Fungsi untuk menampilkan ulasan pelanggan
+      function displayCustomerReviews() {
+        const reviewsContainer = document.getElementById("customer-reviews");
+        reviewsContainer.innerHTML = ""; // Kosongkan dulu
+        if (customersReviews.length === 0) {
+          reviewsContainer.innerHTML =
+            '<p style="text-align: center; color: #888;">Belum ada ulasan. Jadilah yang pertama!</p>';
+          return;
+        }
+        customersReviews.forEach((review) => {
+          const reviewDiv = document.createElement("div");
+          reviewDiv.classList.add("customer-review");
+          reviewDiv.innerHTML = `
+                    <div class="reviewer-name">${review.name} - ${
+            review.product
+          }</div>
+                    <div class="stars">${"⭐".repeat(review.rating)}</div>
+                    <p>"${review.review}"</p>
+                    <small>Tanggal: ${review.date}</small>
+                `;
+          reviewsContainer.appendChild(reviewDiv);
+        });
+      }
+      // Fungsi untuk menampilkan testimoni produk
+      function displayTestimonials() {
+        const testimonialList = document.getElementById("testimonial-list");
+        testimonialList.innerHTML = "";
+        products.forEach((product) => {
+          if (product.testimonial) {
+            const p = document.createElement("p");
+            p.innerHTML = `<strong>${product.name}:</strong> "${product.testimonial}"`;
+            testimonialList.appendChild(p);
+          }
+        });
+      }
+      // Initial calls when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        updateCartDisplay();
+        displayTestimonials();
+        populateReviewProductSelect(); // Isi select produk ulasan saat halaman dimuat
+        displayCustomerReviews(); // Tampilkan ulasan yang mungkin sudah ada (simulasi)
+        // Mengimplementasikan animasi scroll halus untuk navigasi
+        document.querySelectorAll("nav a").forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute("href")).scrollIntoView({
+              behavior: "smooth",
+            });
+          });
+        });
+      });
+    </script>
+
+    <div
+      id="login-page"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #eaf4ff;
+      "
+    >
+      <h2 style="color: #007bff">Selamat Datang di Kitty Seller Shop</h2>
+      <p>Masukkan nama dan email Anda untuk masuk</p>
+      <input
+        type="text"
+        id="login-name"
+        placeholder="Nama"
+        style="padding: 10px; margin: 5px; width: 300px"
+      />
+      <input
+        type="email"
+        id="login-email"
+        placeholder="Email"
+        style="padding: 10px; margin: 5px; width: 300px"
+      />
+      <button
+        onclick="login()"
+        style="
+          padding: 10px 20px;
+          margin: 10px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+        "
+      >
+        Masuk
+      </button>
+      <button
+        onclick="skipLogin()"
+        style="
+          padding: 10px 20px;
+          background-color: #6c757d;
+          color: white;
+          border: none;
+          border-radius: 5px;
+        "
+      >
+        Masuk Gratis
+      </button>
+    </div>
+    <script>
+      function login() {
+        const name = document.getElementById("login-name").value;
+        const email = document.getElementById("login-email").value;
+        if (name && email) {
+          localStorage.setItem("userName", name);
+          document.getElementById("login-page").style.display = "none";
+          document.body.classList.remove("login-only");
+        } else {
+          alert("Mohon masukkan nama dan email.");
+        }
+      }
+      function skipLogin() {
+        document.getElementById("login-page").style.display = "none";
+        document.body.classList.remove("login-only");
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        document.body.classList.add("login-only");
+      });
+    </script>
+    <style>
+      body.login-only > *:not(#login-page) {
+        display: none !important;
+      }
+    </style>
+  </body>
+</html>
